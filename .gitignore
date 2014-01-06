@@ -16,3 +16,9 @@
 *.exe
 *.out
 *.app
+*.eep
+*.hex
+*.elf
+
+# Code:Blocks unnessesaries
+*.layout

@@ -1,3 +1,31 @@
+/**
+ * analog servo controll module for arduino
+ *
+ * date created: January 2014
+ * author: ondrejh.ck@email.cz
+ *
+ * description:
+ * HW controll of analog servo. Modulating pulses with variable width.
+ * Pulse frequency 1/20ms, width 1.0 - 2.0ms. Resolution 1000 steps.
+ * Module uses Timer1 output compare unit.
+ * Clock frequency of arduino should be 16MHz (otherwise it'd be nessesarry to change timing).
+ * Servo pulse input is connected to PB1/OC1A output of MCU (arduino IO9).
+ * Timer and outputs should be initialized by init_servo() first.
+ * Actual servo position can be set by calling set_servo_position( pos ).
+ * The integer value varies from -SERVO_MAX to +SERVO_MAX (see module header).
+ * Higher or lower value is reduced to fit this range.
+ * The position can be read by get_servo_position().
+ *
+ *   arduino         servo
+ *  _________       _______
+ * |         |     |       |
+ * |     IO9 |---->| IN    |
+ * |_________|     |_______|
+ *
+ * note:
+ * The module can be easily extended to second servo output on OC1B.
+ **/
+
 #include <avr/io.h>
 #include "servo.h"
 

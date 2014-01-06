@@ -1,3 +1,8 @@
+/**
+ * analog servo controll module for arduino (header)
+ * see *.c file for details
+ **/
+
 #define SERVO_CLOCK 20000
 #define SERVO_CENTER 1500
 #define SERVO_MAX 500
