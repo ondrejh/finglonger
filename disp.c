@@ -18,6 +18,8 @@ void init_disp(void)
     // init bus IOs
     CLK_HIGH();
     DATA_HIGH();
+    // set default
+    disp_set(BRIGHT_TYPICAL, 0x40, 0xc0);
     // clear display
     disp_clearDisplay();
 }

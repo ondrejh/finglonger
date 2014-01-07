@@ -24,10 +24,18 @@ int main(void)
     DDRC  &= ~0x07;
     PORTC |=  0x07;
 
+    // initializations
     init_uart();
     init_servo(0);
     init_disp();
+
+    // interrupt enable
     sei();
+
+    // display test
+    int8_t data[4]={1,2,3,4};
+    disp_point(true);
+    disp_displayAll(data);
 
     set_sleep_mode(SLEEP_MODE_IDLE);
 
