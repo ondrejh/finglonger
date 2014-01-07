@@ -8,6 +8,7 @@
 
 #include "uart.h"
 #include "servo.h"
+#include "disp.h"
 
 #define BTN_RIGHT  ((PINC&0x01)==0)
 #define BTN_LEFT   ((PINC&0x04)==0)
@@ -25,6 +26,7 @@ int main(void)
 
     init_uart();
     init_servo(0);
+    init_disp();
     sei();
 
     set_sleep_mode(SLEEP_MODE_IDLE);
