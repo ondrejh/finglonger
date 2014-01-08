@@ -36,6 +36,7 @@ int main(void)
     int8_t data[4]={1,2,3,4};
     disp_point(true);
     disp_displayAll(data);
+    disp_displayOne(2,0);
 
     set_sleep_mode(SLEEP_MODE_IDLE);
 

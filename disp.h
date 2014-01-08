@@ -17,8 +17,6 @@
 #define  BRIGHT_TYPICAL 2
 #define  BRIGHTEST      7
 
-uint8_t Cmd_SetData;
-uint8_t Cmd_SetAddr;
 uint8_t Cmd_DispCtrl;
 bool _PointFlag;     //_PointFlag=1:the clock point on
 
@@ -29,7 +27,7 @@ void disp_stop(void);
 void disp_displayAll(int8_t DispData[4]);
 void disp_displayOne(uint8_t BitAddr,int8_t DispData);
 void disp_clearDisplay(void);
-void disp_set(uint8_t brightness,uint8_t SetData,uint8_t SetAddr);
+void disp_brightness(uint8_t brightness);
 void disp_point(bool PointFlag);
 int8_t disp_coding(int8_t DispData);
 
