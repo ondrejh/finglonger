@@ -1,12 +1,16 @@
 #include <avr/io.h>
 #include "disp.h"
 
-#define CLK_LOW() do{PORTC&=~(1<<PIN5);DDRC|=(1<<PIN5);}while(0)
-#define CLK_HIGH() do{PORTC|=(1<<PIN5);DDRC|=(1<<PIN5);}while(0)
-#define DATA_LOW() do{PORTC&=~(1<<PIN4);DDRC|=(1<<PIN4);}while(0)
-#define DATA_HIGH() do{PORTC|=(1<<PIN4);DDRC|=(1<<PIN4);}while(0)
-#define DATA_REL() do{DDRC&=~(1<<PIN4);PORTC&=~(1<<PIN4);}while(0)
-#define DATA ((PINC&(1<<PIN4))!=0)
+#define HW_I2C
+
+#ifndef HW_I2C
+    #define CLK_LOW() do{PORTC&=~(1<<PIN5);DDRC|=(1<<PIN5);}while(0)
+    #define CLK_HIGH() do{PORTC|=(1<<PIN5);DDRC|=(1<<PIN5);}while(0)
+    #define DATA_LOW() do{PORTC&=~(1<<PIN4);DDRC|=(1<<PIN4);}while(0)
+    #define DATA_HIGH() do{PORTC|=(1<<PIN4);DDRC|=(1<<PIN4);}while(0)
+    #define DATA_REL() do{DDRC&=~(1<<PIN4);PORTC&=~(1<<PIN4);}while(0)
+    #define DATA ((PINC&(1<<PIN4))!=0)
+#endif
 
 static int8_t TubeTab[16] = {0x3f,0x06,0x5b,0x4f,
                              0x66,0x6d,0x7d,0x07,
@@ -15,17 +19,26 @@ static int8_t TubeTab[16] = {0x3f,0x06,0x5b,0x4f,
 
 void init_disp(void)
 {
-    // init bus IOs
+    // init bus & IOs
+    #ifndef HW_I2C
     CLK_HIGH();
     DATA_HIGH();
+    #else
+    //set SCL to 400kHz
+    TWSR = 0x00;
+    TWBR = 0x0C;
+    //enable TWI
+    TWCR = (1<<TWEN);
+    #endif
     // set default
-    disp_set(BRIGHT_TYPICAL, 0x40, 0xc0);
+    disp_set(BRIGHT_TYPICAL, ADDR_AUTO, STARTADDR);
     // clear display
     disp_clearDisplay();
 }
 
 void disp_writeByte(int8_t wr_data)
 {
+    #ifndef HW_I2C
     uint8_t i,count1=0;
     for(i=0;i<8;i++)        //sent 8bit data
     {
@@ -51,23 +64,37 @@ void disp_writeByte(int8_t wr_data)
         DATA_REL();//pinMode(Datapin,INPUT);
     }
     DATA_HIGH();//pinMode(Datapin,OUTPUT);
+    #else
+    TWDR = wr_data;
+    TWCR = (1<<TWINT)|(1<<TWEN);
+    while ((TWCR & (1<<TWINT)) == 0);
+    #endif
 }
 
 //send start signal to TM1637
 void disp_start(void)
 {
-  CLK_HIGH();//digitalWrite(Clkpin,HIGH);//send start signal to TM1637
-  DATA_HIGH();//digitalWrite(Datapin,HIGH);
-  DATA_LOW();//digitalWrite(Datapin,LOW);
-  CLK_LOW();//digitalWrite(Clkpin,LOW);
+    #ifndef HW_I2C
+    CLK_HIGH();//digitalWrite(Clkpin,HIGH);//send start signal to TM1637
+    DATA_HIGH();//digitalWrite(Datapin,HIGH);
+    DATA_LOW();//digitalWrite(Datapin,LOW);
+    CLK_LOW();//digitalWrite(Clkpin,LOW);
+    #else
+    TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
+    while ((TWCR & (1<<TWINT)) == 0);
+    #endif
 }
 //End of transmission
 void disp_stop(void)
 {
-  CLK_LOW();//digitalWrite(Clkpin,LOW);
-  DATA_LOW();//digitalWrite(Datapin,LOW);
-  CLK_HIGH();//digitalWrite(Clkpin,HIGH);
-  DATA_HIGH();//digitalWrite(Datapin,HIGH);
+    #ifndef HW_I2C
+    CLK_LOW();//digitalWrite(Clkpin,LOW);
+    DATA_LOW();//digitalWrite(Datapin,LOW);
+    CLK_HIGH();//digitalWrite(Clkpin,HIGH);
+    DATA_HIGH();//digitalWrite(Datapin,HIGH);
+    #else
+    TWCR = (1<<TWINT)|(1<<TWSTO)|(1<<TWEN);
+    #endif
 }
 
 //display function.Write to full-screen.
