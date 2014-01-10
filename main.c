@@ -9,6 +9,7 @@
 #include "uart.h"
 #include "servo.h"
 #include "disp.h"
+#include "sens.h"
 
 #define BTN_RIGHT  ((PINC&0x01)==0)
 #define BTN_CENTER ((PINC&0x02)==0)
@@ -28,6 +29,7 @@ int main(void)
     init_uart();
     init_servo(0);
     init_disp();
+    init_sens();
 
     // interrupt enable
     sei();
