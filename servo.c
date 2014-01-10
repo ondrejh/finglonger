@@ -22,14 +22,24 @@
  * |     IO9 |---->| IN    |
  * |_________|     |_______|
  *
- * note:
- * The module can be easily extended to second servo output on OC1B.
  **/
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "servo.h"
 
 int position = 0;
+
+#ifdef GENERATE_SERVO_TICKS
+volatile uint8_t servo_tick = 0;
+
+uint8_t get_servo_ticks(void)
+{
+    uint8_t tick = servo_tick;
+    servo_tick = 0;
+    return tick;
+}
+#endif
 
 // set servo output
 void set_servo_position(int pos)
@@ -71,8 +81,20 @@ void init_servo(int pos)
     TCCR1B = (2<<CS10) | (1<<WGM13);
     TCCR1C = (1<<FOC1B);
 
+    #ifdef GENERATE_SERVO_TICKS
+    // output compare interrupt enable
+    TIMSK1 = (1<<OCIE1A);
+    #endif
+
     // servo output
     DDRB |= (1<<2);
     PORTB |= (1<<2);
 }
 
+#ifdef GENERATE_SERVO_TICKS
+/// output compare A interrupt handler
+SIGNAL (TIMER1_COMPA_vect)
+{
+    servo_tick++;
+}
+#endif

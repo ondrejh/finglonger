@@ -35,10 +35,11 @@ int main(void)
     sei();
 
     // display test
-    int8_t data[4]={1,2,3,4};
-    disp_point(true);
+    int8_t data[4]={0,0,0,0};
+    /*disp_point(true);
     disp_displayAll(data);
-    disp_displayOne(2,0);
+    disp_displayOne(2,0);*/
+    disp_point(false);
 
     set_sleep_mode(SLEEP_MODE_IDLE);
 
@@ -47,6 +48,27 @@ int main(void)
         sleep_enable();
         sleep_cpu();
         sleep_disable();
+        if (get_servo_ticks())
+        {
+            static uint8_t cnt = 0;
+            cnt++;
+            if (cnt>=5)
+            {
+                cnt=0;
+                static uint16_t dispcnt=0;
+                dispcnt++;
+                if (dispcnt>=10000) dispcnt=0;
+                uint16_t dispcnt_copy = dispcnt;
+                data[3]=dispcnt_copy%10;
+                dispcnt_copy/=10;
+                data[2]=dispcnt_copy%10;
+                dispcnt_copy/=10;
+                data[1]=dispcnt_copy%10;
+                dispcnt_copy/=10;
+                data[0]=dispcnt_copy;
+                disp_displayAll(data);
+            }
+        }
     }
 
 
