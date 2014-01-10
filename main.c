@@ -57,15 +57,14 @@ int main(void)
                 cnt=0;
                 static uint16_t dispcnt=0;
                 dispcnt++;
-                if (dispcnt>=10000) dispcnt=0;
+                if (dispcnt>=1000) dispcnt=0;
                 uint16_t dispcnt_copy = dispcnt;
                 data[3]=dispcnt_copy%10;
                 dispcnt_copy/=10;
                 data[2]=dispcnt_copy%10;
                 dispcnt_copy/=10;
                 data[1]=dispcnt_copy%10;
-                dispcnt_copy/=10;
-                data[0]=dispcnt_copy;
+                data[0]=sens_read();
                 disp_displayAll(data);
             }
         }
