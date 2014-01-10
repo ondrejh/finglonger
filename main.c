@@ -11,8 +11,8 @@
 #include "disp.h"
 
 #define BTN_RIGHT  ((PINC&0x01)==0)
+#define BTN_CENTER ((PINC&0x02)==0)
 #define BTN_LEFT   ((PINC&0x04)==0)
-#define BTN_LIGHTS ((PINC&0x02)==0)
 
 /** main program body */
 int main(void)
