@@ -1,3 +1,33 @@
+//  Driver module for Catalex 4-digit display with TM1637 chip.
+//
+//  Author:Fred.Chu
+//  Date:9 April,2013
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License, or (at your option) any later version.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+//      Modified record:
+//
+//  Author: ondrejh.ck@email.cz
+//  Date: January 2014
+//
+//  Module rewriten to C. Functions "writeByte","start","stop" hidden as local.
+//  "Raw Write" functions added. "Set" function simplified to "Set Brightness" only.
+//
+//  I've tried to use HW TWI bus but it doesn't worked. It'll be brobably nessesary
+//  to add some pullups or modify the module.
+
 #include <avr/io.h>
 #include "disp.h"
 
@@ -14,11 +44,18 @@
 #define DATA_REL() do{DISP_DDR&=~(1<<DISP_DATA_PIN);DISP_PORT&=~(1<<DISP_DATA_PIN);}while(0)
 #define DATA ((DISP_PIN&(1<<DISP_DATA_PIN))!=0)
 
+// local function prototypes
+void disp_writeByte(int8_t wr_data);
+void disp_start(void);
+void disp_stop(void);
+
+// display coding table
 static int8_t TubeTab[16] = {0x3f,0x06,0x5b,0x4f,
                              0x66,0x6d,0x7d,0x07,
                              0x7f,0x6f,0x77,0x7c,
                              0x39,0x5e,0x79,0x71};//0~9,A,b,C,d,E,F
 
+//bus and display initialization
 void init_disp(void)
 {
     // init bus & IOs
@@ -30,6 +67,7 @@ void init_disp(void)
     disp_clearDisplay();
 }
 
+//send one byte over bus (local function)
 void disp_writeByte(int8_t wr_data)
 {
     uint8_t i,count1=0;
@@ -59,7 +97,7 @@ void disp_writeByte(int8_t wr_data)
     DATA_HIGH();//pinMode(Datapin,OUTPUT);
 }
 
-//send start signal to TM1637
+//send start signal to TM1637 (local function)
 void disp_start(void)
 {
     CLK_HIGH();//digitalWrite(Clkpin,HIGH);//send start signal to TM1637
@@ -67,7 +105,8 @@ void disp_start(void)
     DATA_LOW();//digitalWrite(Datapin,LOW);
     CLK_LOW();//digitalWrite(Clkpin,LOW);
 }
-//End of transmission
+
+//End of transmission (local function)
 void disp_stop(void)
 {
     CLK_LOW();//digitalWrite(Clkpin,LOW);
@@ -76,15 +115,22 @@ void disp_stop(void)
     DATA_HIGH();//digitalWrite(Datapin,HIGH);
 }
 
-//display function.Write to full-screen.
+//Display function. Write to full-screen.
 void disp_displayAll(int8_t DispData[4])
 {
-  int8_t SegData[4];
+    int8_t SegData[4];
+    uint8_t i;
+    for(i = 0;i < 4;i ++)
+    {
+        SegData[i] = disp_coding(DispData[i]);
+    }
+    disp_displayAll_Raw(SegData);
+}
+
+//Display function. Write raw segments to full-screen.
+void disp_displayAll_Raw(int8_t SegData[4])
+{
   uint8_t i;
-  for(i = 0;i < 4;i ++)
-  {
-    SegData[i] = disp_coding(DispData[i]);
-  }
   //coding(SegData);
   disp_start();          //start signal sent to TM1637 from MCU
   disp_writeByte(ADDR_AUTO);//
@@ -100,11 +146,17 @@ void disp_displayAll(int8_t DispData[4])
   disp_writeByte(Cmd_DispCtrl);//
   disp_stop();           //
 }
-//******************************************
-void disp_displayOne(uint8_t BitAddr,int8_t DispData)
+
+//Display function. Write one 7seg number.
+void disp_displayOne(uint8_t SegAddr,int8_t DispData)
 {
-  int8_t SegData;
-  SegData = disp_coding(DispData);
+    int8_t SegData = disp_coding(DispData);
+    disp_displayOne_Raw(SegAddr,SegData);
+}
+
+//Display function. Write segments to one char.
+void disp_displayOne_Raw(uint8_t BitAddr,int8_t SegData)
+{
   disp_start();          //start signal sent to TM1637 from MCU
   disp_writeByte(ADDR_FIXED);//
   disp_stop();           //
@@ -117,14 +169,16 @@ void disp_displayOne(uint8_t BitAddr,int8_t DispData)
   disp_stop();           //
 }
 
+//Clear display
 void disp_clearDisplay(void)
 {
-  disp_displayOne(0x00,0x7f);
-  disp_displayOne(0x01,0x7f);
-  disp_displayOne(0x02,0x7f);
-  disp_displayOne(0x03,0x7f);
+  disp_displayOne_Raw(0x00,0x00);
+  disp_displayOne_Raw(0x01,0x00);
+  disp_displayOne_Raw(0x02,0x00);
+  disp_displayOne_Raw(0x03,0x00);
 }
 
+//Display brightness
 //To take effect the next time it displays.
 void disp_brightness(uint8_t brightness)
 {
@@ -138,6 +192,7 @@ void disp_point(bool PointFlag)
   _PointFlag = PointFlag;
 }
 
+//Code one byte (0..A - use table, 0x7f .. zeros)
 int8_t disp_coding(int8_t DispData)
 {
   uint8_t PointData;

@@ -1,3 +1,6 @@
+//  Driver module for Catalex 4-digit display with TM1637 chip.
+//  See *.c for details.
+
 #ifndef _DISP_H_
 #define _DISP_H_
 
@@ -21,11 +24,10 @@ uint8_t Cmd_DispCtrl;
 bool _PointFlag;     //_PointFlag=1:the clock point on
 
 void init_disp(void);
-void disp_writeByte(int8_t wr_data);
-void disp_start(void);
-void disp_stop(void);
 void disp_displayAll(int8_t DispData[4]);
-void disp_displayOne(uint8_t BitAddr,int8_t DispData);
+void disp_displayAll_Raw(int8_t SegData[4]);
+void disp_displayOne(uint8_t SegAddr,int8_t DispData);
+void disp_displayOne_Raw(uint8_t SegAddr,int8_t SegData);
 void disp_clearDisplay(void);
 void disp_brightness(uint8_t brightness);
 void disp_point(bool PointFlag);
