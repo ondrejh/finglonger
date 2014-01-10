@@ -1,32 +1,49 @@
-//  Driver module for Catalex 4-digit display with TM1637 chip.
-//
-//  Author:Fred.Chu
-//  Date:9 April,2013
-//
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License, or (at your option) any later version.
-//
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
-//
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-//      Modified record:
-//
-//  Author: ondrejh.ck@email.cz
-//  Date: January 2014
-//
-//  Module rewriten to C. Functions "writeByte","start","stop" hidden as local.
-//  "Raw Write" functions added. "Set" function simplified to "Set Brightness" only.
-//
-//  I've tried to use HW TWI bus but it doesn't worked. It'll be brobably nessesary
-//  to add some pullups or modify the module.
+/**
+ * Driver module for Catalex 4-digit display with TM1637 chip.
+ *
+ *  Author:Fred.Chu
+ *  Date:9 April,2013
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *      Modified record:
+ *
+ *  Author: ondrejh.ck@email.cz
+ *  Date: January 2014
+ *
+ *  Module rewriten to C. Functions "writeByte","start","stop" hidden as local.
+ *  "Raw Write" functions added. "Set" function simplified to "Set Brightness" only.
+ *
+ *  I've tried to use HW TWI bus but it doesn't worked. It'll be brobably nessesary
+ *  to add some pullups or modify the module.
+ *
+ * HW:
+ * Display is connected through the kind of I2C interface using 2 wires - clk and data.
+ * The connection is set with DISP_PORT/PIN/DDR defining the port, and DISP_CLK_PIN resp.
+ * DISP_DATA_PIN defining the port pins. Actually it's set to PORTC PIN4 - data,
+ * PIN5 - clk, where the HW TWI bus is located (altrough it's not used).
+ *
+ *   arduino            display
+ *  _________          _________
+ * |         |  clk   |         |
+ * |     PC5 |------->|  88:88  |
+ * |     PC4 |<------>|         |
+ * |_________|  data  |_________|
+ *
+ **/
+
 
 #include <avr/io.h>
 #include "disp.h"
