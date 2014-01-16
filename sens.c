@@ -5,10 +5,10 @@
 
 #define SENS_ADC_CHANNEL 3
 
-const uint16_t TouchTab[4] = {818, //4V
-                              409, //2V
-                              102, //0.5V
-                              41}; //0.2V
+const uint16_t TouchTab[4] = {921, //4.5V
+                              512, //2.5V
+                              307, //1.5V
+                              205}; //1.0V
 
 // local funtion prototypes
 uint16_t adc_read(uint8_t ch);
@@ -30,7 +30,7 @@ int8_t sens_read(void)
     uint16_t val = adc_read(SENS_ADC_CHANNEL);
 
     int8_t ret = 0;
-    while(val>TouchTab[ret])
+    while(val<=TouchTab[ret])
     {
         ret++;
         if (ret>3) break;
