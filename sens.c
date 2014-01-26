@@ -5,9 +5,9 @@
 
 #define SENS_ADC_CHANNEL 3
 
-const uint16_t TouchTab[4] = {921, //4.5V
+const uint16_t TouchTab[4] = {716, //3.5V
                               512, //2.5V
-                              307, //1.5V
+                              266, //1.3V
                               205}; //1.0V
 
 // local funtion prototypes
