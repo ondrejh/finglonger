@@ -15,6 +15,12 @@
 #define BTN_CENTER ((PINC&0x02)==0)
 #define BTN_LEFT   ((PINC&0x04)==0)
 
+void use_force(int8_t data[4],uint8_t force)
+{
+    uint8_t i;
+    for (i=0;i<4;i++) if (force>i) data[i]=0x08; else data[i]=0x7F;
+}
+
 /** main program body */
 int main(void)
 {
@@ -27,7 +33,7 @@ int main(void)
 
     // initializations
     init_uart();
-    init_servo(0);
+    init_servo(500);
     init_disp();
     init_sens();
 
@@ -50,7 +56,60 @@ int main(void)
         sleep_disable();
         if (get_servo_ticks())
         {
+            static uint8_t seqv = 0;
             static uint8_t cnt = 0;
+            uint8_t s;
+            switch (seqv)
+            {
+                case 0: // start
+                    set_servo_position(500);
+                    disp_clearDisplay();
+                    seqv++;
+                    break;
+                case 1: // wait test or clock button
+                    if (BTN_CENTER)
+                    {
+                        seqv++;
+                    }
+                    break;
+                case 2: // move down until -500 or force 4
+                    s = sens_read();
+                    use_force(data,s);
+                    disp_displayAll(data);
+                    set_servo_position(get_servo_position()-(4-s)*10);
+                    if ((get_servo_position()<=-500) || (s>=4))
+                    {
+                        cnt=0;
+                        seqv++;
+                    }
+                    break;
+                case 3: // wait a while with force 3
+                    cnt++;
+                    if (cnt>100)
+                    {
+                        seqv++;
+                    }
+                    else
+                    {
+                        s = sens_read();
+                        use_force(data,s);
+                        disp_displayAll(data);
+                        if (s>3) set_servo_position(get_servo_position()+1);
+                        if (s<3) set_servo_position(get_servo_position()-(4-s));
+                    }
+                    break;
+                case 4: // move back to top
+                    s = sens_read();
+                    use_force(data,s);
+                    disp_displayAll(data);
+                    set_servo_position(get_servo_position()+40);
+                    if (get_servo_position()>=500) seqv=0;
+                    break;
+                default:
+                    seqv=0;
+                    break;
+            }
+            /*static uint8_t cnt = 0;
             cnt++;
             if (cnt>=5)
             {
@@ -66,7 +125,7 @@ int main(void)
                 data[1]=dispcnt_copy%10;
                 data[0]=sens_read();
                 disp_displayAll(data);
-            }
+            }*/
         }
     }
 

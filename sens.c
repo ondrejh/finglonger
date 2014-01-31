@@ -5,10 +5,10 @@
 
 #define SENS_ADC_CHANNEL 3
 
-const uint16_t TouchTab[4] = {716, //3.5V
-                              512, //2.5V
-                              266, //1.3V
-                              205}; //1.0V
+const uint16_t TouchTab[4] = {818, //4.0V
+                              512, //3.5V
+                              225, //1.1V
+                              163}; //0.8V
 
 // local funtion prototypes
 uint16_t adc_read(uint8_t ch);
