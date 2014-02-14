@@ -4,7 +4,8 @@ from tkinter import *
 from serial import Serial
 from time import sleep
 
-portname = '/dev/ttyACM0'
+#portname = '/dev/ttyACM0'
+portname = '/dev/ttyUSB0'
 
 def open_port(portname):
     #open port

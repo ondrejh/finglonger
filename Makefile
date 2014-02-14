@@ -14,10 +14,12 @@ OPT = s
 BASEADDR = 0x0000
 
 # arduino port settings
-PORT = /dev/ttyACM0
+#PORT = /dev/ttyACM0
+PORT = /dev/ttyUSB0
 # PORT = COM17
 # BAUDRATE = 9600
-BAUDRATE = 115200
+BAUDRATE = 57600
+#BAUDRATE = 115200
 
 # Name of this Makefile (used for "make depend").
 MAKEFILE = Makefile
