@@ -79,6 +79,7 @@ int main(void)
         {
             static uint8_t seqv = 0;
             static uint8_t cnt = 0;
+            static uint8_t pushcnt = 0;
             uint8_t s;
             switch (seqv)
             {
@@ -88,18 +89,35 @@ int main(void)
                     hours=0;
                     minutes=0;
                     seconds=0;
+                    pushcnt=0;
                     seqv++;
                     break;
                 case (SEQV_RESET+1): // wait buttons released
                     if ((!BTN_MINUTE) && (!BTN_HOUR))
                     {
                         cnt++;
-                        if (cnt>=5) seqv++;
+                        if (cnt>=5)
+                        {
+                            cnt=0;
+                            seqv++;
+                        }
                     }
-                    else cnt=0;
+                    else
+                    {
+                        cnt=0;
+                    }
                     break;
                 case (SEQV_RESET+2): // wait buttons
-                    if (BTN_HOUR || BTN_MINUTE) seqv=SEQV_SET_TIME;
+                    if (BTN_HOUR || BTN_MINUTE)
+                    {
+                        servo_output_enabled = true;
+                        seqv=SEQV_SET_TIME;
+                    }
+                    else
+                    {
+                        cnt++;
+                        if (cnt>=50) servo_output_enabled = false;
+                    }
                     break;
                 case (SEQV_PUSH): // move down until -500 or force 4
                     s = sens_read();
@@ -133,7 +151,20 @@ int main(void)
                     use_force(data,s);
                     disp_displayAll(data);
                     set_servo_position(get_servo_position()+40);
-                    if (get_servo_position()>=500) seqv=0;
+                    if (get_servo_position()>=500)
+                    {
+                        cnt=0;
+                        seqv++;
+                    }
+                    break;
+                case (SEQV_PUSH+3): // wait a while (1s)
+                    cnt++;
+                    if (cnt>50)
+                    {
+                        pushcnt++;
+                        if (pushcnt>1) seqv=0;
+                        else seqv=SEQV_PUSH;
+                    }
                     break;
                 case (SEQV_SET_TIME): // setup clock timer
                     disp_point(true);
@@ -160,6 +191,7 @@ int main(void)
                     else if (cnt>CNT_SET_TIMEOUT)
                     {
                         if ((hours==0) && (minutes==0)) minutes=1;
+                        servo_output_enabled = false;
                         seqv=SEQV_COUNT_TIME;
                     }
                     use_time(data,hours,minutes);
@@ -229,6 +261,7 @@ int main(void)
                             cnt=0;
                             disp_point(true);
                             use_time(data,0,0);
+                            servo_output_enabled = true;
                             seqv++;
                         }
                         else seqv=SEQV_COUNT_TIME;
@@ -251,23 +284,6 @@ int main(void)
                     seqv=SEQV_RESET;
                     break;
             }
-            /*static uint8_t cnt = 0;
-            cnt++;
-            if (cnt>=5)
-            {
-                cnt=0;
-                static uint16_t dispcnt=0;
-                dispcnt++;
-                if (dispcnt>=1000) dispcnt=0;
-                uint16_t dispcnt_copy = dispcnt;
-                data[3]=dispcnt_copy%10;
-                dispcnt_copy/=10;
-                data[2]=dispcnt_copy%10;
-                dispcnt_copy/=10;
-                data[1]=dispcnt_copy%10;
-                data[0]=sens_read();
-                disp_displayAll(data);
-            }*/
         }
     }
 

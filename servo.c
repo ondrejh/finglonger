@@ -30,6 +30,8 @@
 
 int position = 0;
 
+bool servo_output_enabled = false;
+
 #ifdef GENERATE_SERVO_TICKS
 volatile uint8_t servo_tick = 0;
 
@@ -87,14 +89,30 @@ void init_servo(int pos)
     #endif
 
     // servo output
-    DDRB |= (1<<2);
-    PORTB |= (1<<2);
+    //DDRB |= (1<<2);
+    //PORTB |= (1<<2);
 }
 
 #ifdef GENERATE_SERVO_TICKS
 /// output compare A interrupt handler
 SIGNAL (TIMER1_COMPA_vect)
 {
+    static bool loe = true;
+    if (loe!=servo_output_enabled)
+    {
+        if (servo_output_enabled)
+        {
+            DDRB |= (1<<2);
+            PORTB |= (1<<2);
+        }
+        else
+        {
+            DDRB &= ~(1<<2);
+            PORTB &= ~(1<<2);
+        }
+        loe = servo_output_enabled;
+    }
     servo_tick++;
+
 }
 #endif
