@@ -7,8 +7,8 @@
 
 MCU = atmega328p
 FORMAT = ihex
-TARGET = finger
-SRC = main.c uart.c servo.c disp.c sens.c
+TARGET = trainsig
+SRC = main.c
 ASRC =
 OPT = s
 BASEADDR = 0x0000

@@ -2,14 +2,14 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="finglonger" />
+		<Option title="trainsignal" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
 				<Option output="toylights" prefix_auto="1" extension_auto="1" />
-				<Option object_output="C:\GIT\toylights\.objs" />
+				<Option object_output="C:/GIT/toylights/.objs" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -24,25 +24,17 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefile" />
-		<Unit filename="disp.c">
+		<Unit filename="PCM.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="disp.h" />
+		<Unit filename="PCM.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="sens.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="sens.h" />
 		<Unit filename="servo.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="servo.h" />
-		<Unit filename="uart.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="uart.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
