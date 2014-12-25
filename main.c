@@ -24,6 +24,11 @@
 #define BAR1_OUT_OFF() do{PORTB&=~0x04;}while(0)
 #define BAR2_OUT_OFF() do{PORTB&=~0x02;}while(0)
 
+#define SIGNAL_INIT() do{DDRD|=0x60;PORTD&=~0x60;}while(0)
+#define SIGNAL_OFF() do{PORTD&=~0x60;}while(0)
+#define SIGNAL_ON() do{PORTD=(PORTD&~0x60)|0x20;}while(0)
+#define SIGNAL_SWAP() do{PORTD^=0x60;}while(0)
+
 volatile uint16_t millis = 0;
 
 // "Arduino Deulinove"
@@ -38,6 +43,8 @@ const unsigned char sample[] PROGMEM = {
 volatile int16_t sample_ptr = -1;
 volatile int16_t sample_len = 0;
 //volatile uint8_t *psample;
+
+#define PLAYING (sample_ptr>=0)
 
 void pcm_play(void)
 {
@@ -154,14 +161,20 @@ int main(void)
 {
   ARDUINO_LED_INIT();
   BAR_OUT_INIT();
+  SIGNAL_INIT();
 
   init_sample_timer();
   init_pcm();
   sei();
 
-  delay_ms(1000); // wait 1s
+  //delay_ms(1000); // wait 1s
 
-  pcm_play();
+  SIGNAL_ON();
+  while(1) {
+    pcm_play();
+    while(PLAYING);
+    SIGNAL_SWAP();
+  }
 
   ARDUINO_LED_ON();
 
